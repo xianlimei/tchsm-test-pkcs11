@@ -3511,6 +3511,11 @@ void testFindObjectsMechanism(int level, int showMessage)
 			rv = C_FindObjectsInit(hSession[1], NULL_PTR, 1);
 			assert2(behavior, verifyCode(rv, CKR_ARGUMENTS_BAD, "Call to C_FindObjectsInit with second argument NULL_PTR and third != 0"));
 
+			if (rv == CKR_OK)
+			{
+				reinitFindObjects(slot, hSession);
+			}
+
 			
 			rv = C_FindObjects(hSession[1], &hReceiver[0], 1, &returned);
 			assert2(behavior, verifyCode(rv, CKR_OPERATION_NOT_INITIALIZED, "Call to C_FindObjects before calling C_FindObjectsInit"));
@@ -3748,7 +3753,109 @@ void testFindObjectsMechanism(int level, int showMessage)
 	printlnLevel(showMessage, "End: test Find Objects(C_FindObjects|Init|Final)", level);
 }
 
+//
+void reinitFindObjects(CK_SLOT_ID slot, CK_SESSION_HANDLE_PTR hSession)
+{
+			CK_RV rv;
+			
+			rv = C_CloseAllSessions(slot);
+			sprintf(ret, "Call to C_CloseAllSessions with slotID(%d)", (int)slot);
+			assert2(behavior, verifyCode(rv, CKR_OK ,ret));	
+			
+			rv = C_OpenSession(slot, CKF_SERIAL_SESSION | CKF_RW_SESSION, NULL_PTR, NULL_PTR, &hSession[1]);
+			sprintf(ret, "Call to C_OpenSession with slotID(%d) trying to open a R/W session", (int)slot);
+			assert2(behavior, verifyCode(rv, CKR_OK, ret));
 
+			rv = C_OpenSession(slot, CKF_SERIAL_SESSION, NULL_PTR, NULL_PTR, &hSession[0]);
+			sprintf(ret, "Call to C_OpenSession with slotID(%d) trying to open a R/O session", (int)slot);
+			assert2(behavior, verifyCode(rv, CKR_OK, ret));
+
+			
+			////	
+			rv = C_Login(hSession[1], CKU_USER, userPIN, strlen(userPIN));
+			assert2(behavior, verifyCode(rv, CKR_OK, "Call to C_Login with CKU_USER user type"));
+
+}
+
+
+///
+void reinitFindObjectsCreated(CK_SLOT_ID slot, CK_SESSION_HANDLE_PTR hSession, CK_OBJECT_HANDLE_PTR hObject, CK_ATTRIBUTE_PTR pubTemplate)
+{
+			CK_RV rv;
+			CK_BBOOL false = CK_FALSE;
+			CK_BBOOL true = CK_TRUE;			
+			rv = C_CloseAllSessions(slot);
+			sprintf(ret, "Call to C_CloseAllSessions with slotID(%d)", (int)slot);
+			assert2(behavior, verifyCode(rv, CKR_OK ,ret));
+			
+
+			char * textLabel = "A token";
+        		CK_UTF8CHAR paddedLabel[32];
+        		memset(paddedLabel, ' ', sizeof(paddedLabel));
+        		memcpy(paddedLabel, textLabel, strlen(textLabel));
+	
+			int ind = indexOfElem((int)slot, (int *)slotsWithInitToken, (int)numberOfSlotsWithInitToken);
+			sprintf(ret, "Call to C_InitToken with slotID(%d)", (int)slot);
+			rv = C_InitToken(slot, soPINs[ind], strlen(soPINs[ind]), paddedLabel);
+			assert2(behavior, verifyCode(rv, CKR_OK, ret));
+
+			rv = C_OpenSession(slot, CKF_SERIAL_SESSION | CKF_RW_SESSION, NULL_PTR, NULL_PTR, &hSession[1]);
+			sprintf(ret, "Call to C_OpenSession with slotID(%d) trying to open a R/W session", (int)slot);
+			assert2(behavior, verifyCode(rv, CKR_OK, ret));
+
+			rv = C_Login(hSession[1], CKU_SO, soPINs[ind], strlen(soPINs[ind]));
+			assert2(behavior, verifyCode(rv, CKR_OK, "Call to C_Login with CKU_SO user type"));
+
+			rv = C_InitPIN(hSession[1], userPIN, strlen(userPIN));
+			sprintf(ret, "Call to C_InitPIN with a R/W session handle, second argument %s and third argument %d", (char *)userPIN, (int)strlen(userPIN));
+			assert2(behavior, verifyCode(rv, CKR_OK, ret));
+
+			rv = C_Logout(hSession[1]);
+			assert2(behavior, verifyCode(rv, CKR_OK, "Call to C_Logout"));
+
+			rv = C_Login(hSession[1], CKU_SO, soPINs[ind], strlen(soPINs[ind]));
+			assert2(behavior, verifyCode(rv, CKR_OK, "Call to C_Login with CKU_USER user type"));
+
+			pubTemplate[2].pValue = &true;
+			pubTemplate[2].ulValueLen = sizeof(true);
+			pubTemplate[7].pValue = &false;
+			pubTemplate[7].ulValueLen = sizeof(false);
+
+
+			rv = C_CreateObject(hSession[1], pubTemplate, 9, &hObject[1]);
+			assert2(behavior, verifyCode(rv, CKR_OK, "Call to C_CreateObject trying to create a token public object"));
+
+			rv = C_CreateObject(hSession[1], pubTemplate, 9, &hObject[4]);
+			assert2(behavior, verifyCode(rv, CKR_OK, "Call to C_CreateObject trying to create a token public object"));
+
+			//
+			pubTemplate[2].pValue = &false;
+			pubTemplate[2].ulValueLen = sizeof(false);
+			pubTemplate[7].pValue = &true;
+			pubTemplate[7].ulValueLen = sizeof(true);
+
+			rv = C_CreateObject(hSession[1], pubTemplate, 9, &hObject[2]);
+			assert2(behavior, verifyCode(rv, CKR_OK, "Call to C_CreateObject trying to create a session private object"));
+
+			//
+
+			pubTemplate[2].pValue = &false;
+			pubTemplate[2].ulValueLen = sizeof(false);
+			pubTemplate[7].pValue = &false;
+			pubTemplate[7].ulValueLen = sizeof(false);
+
+			rv = C_CreateObject(hSession[1], pubTemplate, 9, &hObject[3]);
+			sprintf(ret, "Call to C_CreateObject with sesion R/W abierta y logueada en normal user  n slotID(%d) of C_GetSlotList(CK_TRUE) y with flags CKF_TOKEN_INITIALIZED encendido y CKF_WRITE_PROTECTED apagado", (int)slot);
+			assert2(behavior, verifyCode(rv, CKR_OK, "Call to C_CreateObject trying to create a session public object"));
+
+			//
+			
+			pubTemplate[2].pValue = &true;
+			pubTemplate[2].ulValueLen = sizeof(true);
+			pubTemplate[7].pValue = &true;
+			pubTemplate[7].ulValueLen = sizeof(true);
+
+}
 
 ///
 void stressFindObjectsMechanism(int level, int repetitions, int showMessage)

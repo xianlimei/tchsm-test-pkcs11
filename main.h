@@ -45,7 +45,8 @@ void stressGenerateKeyPair(int level, int repetitions, int showMessage);
 void testGetAttributeValue(int level, int showMessage);
 void stressGetAttributeValue(int level, int repetitions, int showMessage);
 void testFindObjectsMechanism(int level, int showMessage);
-//void reinitFindObjects(CK_SLOT_ID slot, CK_SESSION_HANDLE_PTR hSession, int objectsPresent);
+void reinitFindObjects(CK_SLOT_ID slot, CK_SESSION_HANDLE_PTR hSession);
+void reinitFindObjectsCreated(CK_SLOT_ID slot, CK_SESSION_HANDLE_PTR hSession, CK_OBJECT_HANDLE_PTR hObject, CK_ATTRIBUTE_PTR pubTemplate);
 void stressFindObjectsMechanism(int level, int repetitions, int showMessage);
 
 void testMechanisms(int level, int showMessage);
