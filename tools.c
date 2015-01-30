@@ -10,12 +10,10 @@
 extern CK_FUNCTION_LIST_PTR lib;
 //Pointer to cryptoki function
 void* openLib;
-//TRANSLATE COMMENTS
-//Funcion que recibe una condicion y un mensaje,
-//si la condicion es falsa, esta se imprime.
-//Retorna el valor de la condicion.
-//Funcion sirve para imprimir un mensaje descriptivo
-//cuando no se pasa algun test
+
+/**
+* Function prints a message if cond is 0
+*/
 int message(int cond, char* message)
 {
 	if (!cond)
@@ -24,10 +22,12 @@ int message(int cond, char* message)
 }
 
 
-//Funcion que recibe dos codigos de retorno y un mensaje previo,
-//Si los codigos son distintos imprime el mensaje previo junto con
-//los codigos
-//Retorna true si los codigos son iguales.
+
+/**
+* Function receives two return codes
+* if different prints a previous message followed by codes
+* returns ! = 0 if the codes are equals
+*/
 int verifyCode(CK_RV geted, CK_RV expected, char * previus)
 {
 	if (!(geted == expected))
@@ -42,10 +42,12 @@ int verifyCode(CK_RV geted, CK_RV expected, char * previus)
 	return geted == expected;
 }
 
-//Funcion que recibe tres codigos de retorno y un mensaje previo,
-//Si el geted es diferente a todos los expected imprime el mensaje previo junto con
-//los codigos
-//Retorna true si el geted es igual a alguno de los expected
+
+/**
+* Function receives three return codes
+* if expected is different to all others prints a previous message followed by codes
+* returns ! = 0 if the expected is equal to some code
+*/
 int verifyCode2(CK_RV geted, CK_RV expected, CK_RV expected2, char * previus)
 {
 	if (!(geted == expected || geted == expected2))
@@ -63,10 +65,11 @@ int verifyCode2(CK_RV geted, CK_RV expected, CK_RV expected2, char * previus)
 }
 
 
-//Funcion que recibe tres codigos de retorno y un mensaje previo,
-//Si el geted es diferente a todos los expected imprime el mensaje previo junto con
-//los codigos
-//Retorna true si el geted es igual a alguno de los expected
+/**
+* Function receives fourth return codes
+* if expected is different to all others prints a previous message followed by codes
+* returns ! = 0 if the expected is equal to some code
+*/
 int verifyCode3(CK_RV geted, CK_RV expected, CK_RV expected2, CK_RV expected3, char * previus)
 {
 	if (!(geted == expected || geted == expected2 || geted == expected3))
@@ -86,9 +89,10 @@ int verifyCode3(CK_RV geted, CK_RV expected, CK_RV expected2, CK_RV expected3, c
 }
 
 
-//Inicializa la libreria dinamica
-//Retorna 1 si la operacion fue exitosa
-//0 si no
+/*
+* Initialices the dynamic cryptoki library
+* Returns 1 on success, 0 on fails
+*/
 int initDynamicLibrary(char* path)
 {
 	openLib = dlopen(path, RTLD_LAZY);
@@ -99,7 +103,7 @@ int initDynamicLibrary(char* path)
 		return 0;
 	}
 
-	dlerror(); //Limpiar errores existentes
+	dlerror(); //Clean previus errors
 	void  (* getFunctionList)(CK_FUNCTION_LIST_PTR_PTR) =  dlsym(openLib, "C_GetFunctionList");
 	char *e;	
 	if ((e = dlerror()) != NULL) 
@@ -113,9 +117,10 @@ int initDynamicLibrary(char* path)
 	return 1;	
 }
 
-//Cierra la libreria dinamica
-//Retorna 1 si la operacion fue exitosa
-//0 si no
+/*
+* Closes the dynamic cryptoki library
+* Returns 1 on success, 0 on fails
+*/
 int closeDynamicLibrary()
 {
 	if (dlclose(openLib) != 0)
@@ -127,10 +132,10 @@ int closeDynamicLibrary()
 	return 1;
 }
 
-//Funcion imprime en salida estandar
-//el string en data, con un nivel de
-//indentacion level
-//Si showMessage es 0 no se muestra el mensage
+/*
+* Funtion prints in stdout the data, in the indentation level "level"
+* If showMessage is 0 it does not print the message
+*/
 void printlnLevel(int showMessage, char* data ,int level)
 {
 	if(showMessage)
@@ -142,11 +147,11 @@ void printlnLevel(int showMessage, char* data ,int level)
 	}
 }
 
-//Chequea que todos los punteros a fuciones de la estructura
-//sean validos(si una funcion no se encuentra implementada, 
-//el puntero debe apuntar a una funcion que retorne CKR_FUNCTION_
-//NOT_SUPPORTED)
-//Retorna NULL_PTR en caso de exito, y el nombre de una funcion no implementada en caso contrario
+
+/*
+* Checks if all the pointers in C_GetFunctionList result are != NULL_PTR
+* If it finds a NULL_PTR, returns its name, NULL_PTR if not
+*/
 char* checkCkFunctionList(CK_FUNCTION_LIST_PTR pFunctions)
 {
 	char* temp = NULL_PTR;
@@ -287,8 +292,9 @@ char* checkCkFunctionList(CK_FUNCTION_LIST_PTR pFunctions)
 	return retu;
 }
 
-//Retorna 1 si el set tiene a elem como elemento
-//0 en caso contrario
+/*
+* Returns 1 if set of size elements, contains elem
+*/
 int contains(int * set, int size, int elem)
 {
 	int i;
@@ -299,8 +305,9 @@ int contains(int * set, int size, int elem)
 	return 0;
 }
 
-//Retorna 1 si el string src no tiene NULL_PTR,
-//0 en otro caso
+/*
+* Return 1 if src does not have a NULL_PTR element
+*/
 int isBlankPadded(unsigned char * src, int n)
 {
 	int i;
@@ -311,9 +318,12 @@ int isBlankPadded(unsigned char * src, int n)
 	return 1;
 }
 
-//From the source in byte mode build the same in str mode and keep 
-// the result into the result param if the sourceLen is N then the 
-//result should have enough memory to keep 2N + 1 spaces
+/**
+* Transform from binary to hex
+* From the source in byte mode build the same in str mode and keep 
+* the result into the result param if the sourceLen is N then the 
+* result should have enough memory to keep 2N + 1 spaces
+*/
 void toStr(unsigned char * source, int sourceLen, char * result)
 {
 	int j;
@@ -328,8 +338,10 @@ void toStr(unsigned char * source, int sourceLen, char * result)
 	result[2*sourceLen] = 0;
 }
 
-//Retorna el indice del primer elemento elem en el arreglo array de n elementos
-//-1 si no existe
+/**
+* Return the index of the first element in array(of n elements)
+* of elem, -1 if it does not exist
+*/
 int indexOfElem(int elem, int * array, int n)
 {
 	int x;
@@ -340,10 +352,11 @@ int indexOfElem(int elem, int * array, int n)
 	return -1;
 }
 
-//assert 2 recibe un comportamiento y una condicion
-//Si el comportamiento es ASK, se pregunta al usuario si se sigue con la ejecucion del test
-//Si el comportamiento es FAIL, el test termina
-//Si el comportamiento es PASS, el test continua
+/**
+* If beh is ASK and cond is 0, asks the user whether to continue with the execution of the test
+* If beh is FAIL and cond is 0, the test finishes
+* Otherwise nothing happens
+*/
 void assert2(int beh, int cond)
 {
 	switch(beh)
@@ -366,7 +379,9 @@ void assert2(int beh, int cond)
 
 }
 
-//Rellena el nombre de una clase dado su valor(especificado en PKCS11)
+/**
+* Fill the buffer with the name of the class(specified in PKCS11) of elem
+*/
 void getClassName(CK_OBJECT_CLASS elem, char * buffer)
 {
 	switch(elem)
@@ -394,7 +409,9 @@ void getClassName(CK_OBJECT_CLASS elem, char * buffer)
 }
 
 
-//Rellena el nombre de un tipo de usuario dado su valor(especificado en PKCS11)
+/**
+* Fill the buffer with the name of the user type(specified in PKCS11) of elem
+*/
 void getUserName(CK_USER_TYPE elem, char * buffer)
 {
 	switch(elem)
@@ -418,7 +435,9 @@ void getUserName(CK_USER_TYPE elem, char * buffer)
 	}
 }
 
-//Rellena el nombre de un estado dado su valor(especificado en PKCS11)
+/**
+* Fill the buffer with the name of the state(specified in PKCS11) of elem
+*/
 void getStateName(CK_STATE elem, char * buffer)
 {
 	switch(elem)
@@ -449,7 +468,9 @@ void getStateName(CK_STATE elem, char * buffer)
 	}
 }
 
-//Rellena el nombre de un hadware dado su valor(especificado en PKCS11)
+/**
+* Fill the buffer with the name of the Hadware(specified in PKCS11) of elem
+*/
 void getHadwareName(CK_HW_FEATURE_TYPE elem, char * buffer)
 {
 	switch(elem)
@@ -464,7 +485,9 @@ void getHadwareName(CK_HW_FEATURE_TYPE elem, char * buffer)
 	}
 }
 
-//Rellena el nombre de una key dado su valor(especificado en PKCS11)
+/**
+* Fill the buffer with the name of the key(specified in PKCS11) of elem
+*/
 void getKeyName(CK_KEY_TYPE elem, char * buffer)
 {
 	switch(elem)
@@ -488,7 +511,9 @@ void getKeyName(CK_KEY_TYPE elem, char * buffer)
 	}
 }
 
-//Rellena el nombre de un atributo dado su valor(especificado en PKCS11)
+/**
+* Fill the buffer with the name of the attribute(specified in PKCS11) of elem
+*/
 void getAttributeName(CK_ATTRIBUTE_TYPE elem, char * buffer)
 {
 	switch(elem)
@@ -592,7 +617,9 @@ void getAttributeName(CK_ATTRIBUTE_TYPE elem, char * buffer)
 	}
 }
 
-//Rellena el nombre de un mecanismo dado su valor(especificado en PKCS11)
+/**
+* Fill the buffer with the name of the mechanism(specified in PKCS11) of elem
+*/
 void getMechanismName(CK_MECHANISM_TYPE elem, char * buffer)
 {
 	switch(elem)
@@ -636,7 +663,9 @@ void getMechanismName(CK_MECHANISM_TYPE elem, char * buffer)
 	}
 }
 
-//Rellena el nombre de un mecanismo dado su valor(especificado en PKCS11)
+/**
+* Fill the buffer with the name of the code name(specified in PKCS11) of elem
+*/
 void getCodeName(CK_RV elem, char * buffer)
 {
 	switch(elem)

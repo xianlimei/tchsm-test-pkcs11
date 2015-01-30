@@ -47,7 +47,7 @@ void usage()
 }
 
 
-//main, initializes ther variables, calls the tests and opens/closes the library
+//main, initialices ther variables, calls the tests and opens/closes the library
 int main(int argc, char **argv)
 {
 	// For SoftHSM testing
