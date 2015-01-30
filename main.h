@@ -1,0 +1,65 @@
+void usage();
+void apiTest();
+void testNoToken(int level, int showMessage);
+void testInitializeFinalize(int level, int showMessage);
+void stressInitializeFinalize(int level, int repetitions, int showMessage);
+void testGetFunctionList(int level, int showMessage);
+void stressGetFunctionList(int level, int repetitions, int showMessage);
+void testGetInfo(int level, int showMessage);
+void stressGetInfo(int level, int repetitions, int showMessage);
+void testGetSlotList(int level, int showMessage);
+void stressGetSlotList(int level, int repetitions, int showMessage);
+void testGetSlotInfo(int level, int showMessage);
+void stressGetSlotInfo(int level, int repetitions, int showMessage);
+void testNoSessionHandle(int level, int showMessage);
+void testGetTokenInfo(int level, int showMessage);
+void stressGetTokenInfo(int level, int repetitions, int showMessage);
+void testInitToken(int level, int showMessage);
+void stressInitToken(int level, int repetitions, int showMessage);
+void testOpenSession(int level, int showMessage);
+void stressOpenSession(int level, int repetitions, int showMessage);
+void testCloseSession(int level, int showMessage);
+void stressCloseSession(int level, int repetitions, int showMessage);
+void testCloseAllSessions(int level, int showMessage);
+void stressCloseAllSessions(int level, int repetitions, int showMessage);
+void testSessionHandleNeeded(int level, int showMessage);
+void testSessionHandleManagement(int level, int showMessage);
+void testGetSessionInfo(int level, int showMessage);
+void stressGetSessionInfo(int level, int repetitions, int showMessage);
+void testInitPin(int level, int showMessage);
+void stressInitPin(int level, int repetitions, int showMessage);
+void testLogin(int level, int showMessage);
+void stressLogin(int level, int repetitions, int showMessage);
+void testLogout(int level, int showMessage);
+void stressLogout(int level, int repetitions, int showMessage);
+void testSetPin(int level, int showMessage);
+void stressSetPin(int level, int repetitions, int showMessage);
+
+void testObjectManagementFunctions(int level, int showMessage);
+void testCreateObject(int level, int showMessage);
+void stressCreateObject(int level, int repetitions, int showMessage);
+void testDestroyObject(int level, int showMessage);
+void stressDestroyObject(int level, int repetitions, int showMessage);
+void testGenerateKeyPair(int level, int showMessage);
+void stressGenerateKeyPair(int level, int repetitions, int showMessage);
+void testGetAttributeValue(int level, int showMessage);
+void stressGetAttributeValue(int level, int repetitions, int showMessage);
+void testFindObjectsMechanism(int level, int showMessage);
+//void reinitFindObjects(CK_SLOT_ID slot, CK_SESSION_HANDLE_PTR hSession, int objectsPresent);
+void stressFindObjectsMechanism(int level, int repetitions, int showMessage);
+
+void testMechanisms(int level, int showMessage);
+void testSignMechanism(int level, int showMessage);
+void reinitSign(CK_SLOT_ID slot, CK_SESSION_HANDLE_PTR hSession, CK_MECHANISM mechanism, CK_ATTRIBUTE_PTR publicKeyTemplate, CK_ATTRIBUTE_PTR privateKeyTemplate, CK_ATTRIBUTE_PTR privateKeyTemplateNoSign, CK_OBJECT_HANDLE_PTR pHPublicKey, CK_OBJECT_HANDLE_PTR pHPrivateKey, CK_OBJECT_HANDLE_PTR pHPublicNoSignKey, CK_OBJECT_HANDLE_PTR pHPrivateNoSignKey);
+void stressSignMechanism(int level, int repetitions, int showMessage);
+void testDigestMechanism(int level, int showMessage);
+void reinitDigest(CK_SLOT_ID slot, CK_SESSION_HANDLE_PTR hSession);
+void stressDigestMechanism(int level, int repetitions, int showMessage);
+
+void testRNGFunctions(int level, int showMessage);
+void testSeedRandom(int level, int showMessage);
+void stressSeedRandom(int level, int repetitions, int showMessage);
+void testGenerateRandom(int level, int showMessage);
+void stressGenerateRandom(int level, int repetitions, int showMessage);
+
+
